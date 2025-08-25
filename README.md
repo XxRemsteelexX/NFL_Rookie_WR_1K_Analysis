@@ -23,15 +23,10 @@ This project develops a machine learning model to predict which NFL rookie wide 
 ```
 NFL_Rookie_WR_1K_Analysis/
 │
-├── Downloads/                      # Raw data files
+├── data/                           # Raw data files
 │   ├── 2006-2024 rookie data     # Rookie season statistics
 │   ├── rec2006-2023.csv          # Reception data by year
 │   └── 1kseasons.csv             # Career outcome data
-│
-├── Uploads/                        # Original uploaded files
-│   ├── rookie data files
-│   ├── advanced metrics files
-│   └── model.pkl
 │
 ├── outputs/                        # Processed data and models
 │   ├── cleaned_dataset.parquet    # Integrated dataset
@@ -51,8 +46,9 @@ NFL_Rookie_WR_1K_Analysis/
 │   ├── calibration_comparison.png
 │   └── feature_selection_analysis.png
 │
-├── notebooks/
-│   └── NFL_WR_Analysis_Complete.ipynb  # Comprehensive analysis notebook
+├── notebooks/                      # Jupyter notebooks
+│   ├── NFL_WR_Analysis_Complete.ipynb     # Comprehensive documentation notebook
+│   └── NFL_WR_Rookie_Prediction_Analysis_Fixed_executed.ipynb  # Executed analysis with results
 │
 ├── scripts/                        # Analysis scripts
 │   ├── 01_build_dataset.py       # Data loading and merging
@@ -63,22 +59,12 @@ NFL_Rookie_WR_1K_Analysis/
 │   ├── 06_predict_recent.py      # Recent rookie predictions
 │   ├── 07_feature_analysis_selection.py  # Feature optimization
 │   ├── 08_improved_model.py      # Improved model with temporal validation
-│   ├── build_notebook.py         # Notebook generation
-│   ├── build_final_notebook.py   # Final notebook creation
-│   ├── fix_data_leakage.py       # Data leakage fixes
-│   ├── fix_model_calibration.py  # Model calibration
 │   └── utils.py                  # Utility functions
-│
-├── src/                           # Source code modules
-│   ├── __init__.py
-│   ├── utils.py
-│   └── visuals.py
-│
-├── Old Files/                     # Legacy HTML reports
 │
 ├── requirements.txt               # Python dependencies
 ├── README.md                      # This file
-└── LICENSE                        # MIT License
+├── LICENSE                        # MIT License
+└── .gitignore                     # Git ignore file
 ```
 
 ## Quick Start
@@ -122,10 +108,21 @@ python scripts/07_feature_analysis_selection.py
 python scripts/08_improved_model.py
 ```
 
-#### Option 2: Use the Jupyter Notebook
+#### Option 2: Use the Jupyter Notebooks
+
+We provide two comprehensive notebooks:
+
+1. **For executed results and full pipeline**:
+```bash
+jupyter notebook notebooks/NFL_WR_Rookie_Prediction_Analysis_Fixed_executed.ipynb
+```
+This notebook contains the complete executed analysis with all results, visualizations, and model outputs.
+
+2. **For comprehensive documentation and journey**:
 ```bash
 jupyter notebook notebooks/NFL_WR_Analysis_Complete.ipynb
 ```
+This notebook documents the entire analysis journey including overfitting diagnosis, feature selection, and model improvements.
 
 ## Key Findings
 
