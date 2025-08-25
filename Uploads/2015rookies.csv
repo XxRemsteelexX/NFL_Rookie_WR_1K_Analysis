@@ -1,0 +1,35 @@
+Rnd,Pick,Tm,Player,Pos,Age,To,AP1,PB,St,wAV,DrAV,G,Cmp,Att,Yds,TD,Int,Att,Yds,TD,Rec,Yds,TD,Solo,Int,Sk,College/Univ,,-9999
+1,4,OAK,Amari Cooper,WR,21,2023,0,5,8,64,22,140,0,1,0,0,1,14,41,0,667,9486,60,2,,,Alabama,College Stats,CoopAm00
+1,7,CHI,Kevin White,WR,23,2022,0,0,0,3,2,30,0,0,0,0,0,1,9,0,28,397,0,2,,,West Virginia,College Stats,WhitKe00
+1,14,MIA,DeVante Parker,WR,22,2023,0,0,5,36,32,119,0,0,0,0,0,0,0,0,402,5660,27,3,,,Louisville,College Stats,ParkDe01
+1,20,PHI,Nelson Agholor,WR,22,2023,0,0,7,35,18,135,1,1,15,0,0,14,71,0,375,4627,35,1,,,USC,College Stats,AghoNe00
+1,26,BAL,Breshad Perriman,WR,21,2022,0,0,1,15,4,80,0,0,0,0,0,11,16,0,145,2343,16,,,,Central Florida,College Stats,PerrBr02
+1,29,IND,Phillip Dorsett,WR,22,2023,0,0,0,16,7,94,0,1,0,0,0,14,84,0,151,2001,12,,,,Miami (FL),College Stats,DorsPh00
+2,37,NYJ,Devin Smith,WR,23,2021,0,0,0,2,1,22,0,0,0,0,0,0,0,0,15,248,2,3,,,Ohio St.,College Stats,SmitDe04
+2,40,TEN,Dorial Green-Beckham,WR,22,2016,0,0,0,7,4,31,0,0,0,0,0,0,0,0,68,941,6,,,,Oklahoma,College Stats,GreeDo00
+3,69,SEA,Tyler Lockett,WR,22,2023,1,1,8,64,64,144,0,0,0,0,0,40,265,1,612,7994,59,3,,,Kansas St.,College Stats,LockTy00
+3,70,HOU,Jaelen Strong,WR,21,2017,0,0,0,2,2,20,0,0,0,0,0,0,0,0,31,330,4,,,,Arizona St.,College Stats,StroJa01
+3,76,KAN,Chris Conley,WR,22,2023,0,0,3,22,11,117,0,0,0,0,0,1,3,0,220,2922,15,4,,,Georgia,College Stats,ConlCh00
+3,87,PIT,Sammie Coates,WR,22,2018,0,0,0,4,4,44,0,0,0,0,0,4,14,0,29,528,2,8,,,Auburn,College Stats,CoatSa00
+3,94,GNB,Ty Montgomery,WR,22,2023,0,0,1,17,13,92,0,0,0,0,0,263,1187,7,147,1159,4,15,,,Stanford,College Stats,MontTy01
+4,105,WAS,Jamison Crowder,WR,22,2023,0,0,4,32,21,117,1,2,43,1,0,17,82,0,431,4826,29,3,,,Duke,College Stats,CrowJa00
+4,107,ATL,Justin Hardy,WR,23,2019,0,0,0,8,8,73,0,0,0,0,0,0,0,0,95,946,9,5,,,East Carolina,College Stats,HardJu00
+4,123,CLE,Vince Mayle,WR,24,2017,0,0,0,0,,23,0,0,0,0,0,2,2,1,0,0,0,9,,,Washington St.,College Stats,MaylVi00
+4,132,SFO,DeAndre Smelter,WR,23,2016,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,23,0,,,,Georgia Tech,,SmelDe00
+5,139,JAX,Rashad Greene,WR,22,2018,0,0,0,2,2,25,0,0,0,0,0,0,0,0,30,185,2,,,,Florida St.,College Stats,GreeRa00
+5,146,MIN,Stefon Diggs,WR,21,2023,1,4,8,83,33,136,0,1,0,0,0,32,162,0,810,9995,67,2,,,Maryland,College Stats,DiggSt00
+5,156,MIA,Tony Lippett,WR,23,2018,0,0,1,6,6,28,0,0,0,0,0,0,0,0,0,0,0,58,4,,Michigan St.,College Stats,LippTo00
+5,159,ARI,JJ Nelson,WR,23,2019,0,0,0,12,12,58,0,0,0,0,0,12,120,1,85,1475,11,1,,,Ala-Birmingham,,NelsJJ00
+5,162,TAM,Kenny Bell,WR,23,,0,0,0,,,,,,,,,,,,,,,,,,Nebraska,College Stats,BellKe02
+5,175,HOU,Keith Mumphery,WR,23,2016,0,0,0,2,2,27,0,0,0,0,0,0,0,0,24,198,0,5,,,Michigan St.,College Stats,MumpKe00
+6,184,TAM,Kaelin Clay,WR,23,2018,0,0,0,3,,22,0,0,0,0,0,3,27,0,6,85,0,1,,,Utah,College Stats,ClayKa00
+6,186,NYG,Geremy Davis,WR,23,2019,0,0,0,0,0,36,0,0,0,0,0,0,0,0,5,59,0,11,,,Connecticut,College Stats,DaviGe00
+6,187,WAS,Evan Spencer,WR,22,2015,0,0,0,0,,1,0,0,0,0,0,0,0,0,0,0,0,1,,,Ohio St.,College Stats,SpenEv00
+6,201,STL,Bud Sasser,WR,,,0,0,0,,,,,,,,,,,,,,,,,,Missouri,College Stats,SassBu00
+6,204,BAL,Darren Waller,WR,22,2023,0,1,3,31,1,86,0,0,0,0,0,3,26,0,350,4124,20,10,,,Georgia Tech,College Stats,WallDa01
+7,220,JAX,Neal Sterling,WR,23,2018,0,0,0,2,1,35,0,0,0,0,0,0,0,0,24,239,0,3,,,Monmouth,,SterNe00
+7,221,OAK,Andre Debose,WR,,,0,0,0,,,,,,,,,,,,,,,,,,Florida,,DeboAn00
+7,233,KAN,Da'Ron Brown,WR,23,,0,0,0,,,,,,,,,,,,,,,,,,Northern Illinois,,BrowDa03
+7,234,BUF,Dezmin Lewis,WR,22,2016,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,,,,Central Arkansas,,LewiDe02
+7,238,CIN,Mario Alford,WR,23,2016,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,15,0,,,,West Virginia,College Stats,AlfoMa00
+7,245,TEN,Tre McBride,WR,22,2017,0,0,0,1,0,17,0,0,0,0,0,1,8,0,10,152,1,5,,,William & Mary,,McBrTr00

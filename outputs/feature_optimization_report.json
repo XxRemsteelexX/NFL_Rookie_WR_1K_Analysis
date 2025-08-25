@@ -1,0 +1,174 @@
+{
+  "optimized_features": [
+    "draft_round",
+    "age",
+    "rec_td",
+    "yards_per_reception",
+    "draft_capital_score",
+    "early_round",
+    "first_round",
+    "top_3_wr",
+    "top_5_wr",
+    "modern_era",
+    "young_rookie",
+    "old_rookie",
+    "target_percentile",
+    "yards_percentile",
+    "rec_50_plus",
+    "catch_rate_65_plus",
+    "draft_x_yards",
+    "breakout_score",
+    "rec_yards_log",
+    "rec_yards_zscore"
+  ],
+  "removed_features": [
+    [
+      "opportunity_x_efficiency",
+      "near-zero variance"
+    ],
+    [
+      "td_per_reception",
+      "near-zero variance"
+    ],
+    [
+      "target_rate",
+      "near-zero variance"
+    ],
+    [
+      "td_3_plus",
+      "near-zero variance"
+    ],
+    [
+      "rookie_production_score",
+      "near-zero variance"
+    ],
+    [
+      "efficiency_score",
+      "near-zero variance"
+    ],
+    [
+      "high_target_rookie",
+      "near-zero variance"
+    ],
+    [
+      "early_round_x_targets",
+      "high feature correlation"
+    ],
+    [
+      "yards_500_plus",
+      "high feature correlation"
+    ],
+    [
+      "yards_per_target",
+      "high feature correlation"
+    ],
+    [
+      "rec_yards_sqrt",
+      "high feature correlation"
+    ],
+    [
+      "draft_pick",
+      "high feature correlation"
+    ],
+    [
+      "yards_per_route_run",
+      "high feature correlation"
+    ],
+    [
+      "targets_log",
+      "high feature correlation"
+    ],
+    [
+      "targets",
+      "high feature correlation"
+    ],
+    [
+      "catch_rate",
+      "high feature correlation"
+    ],
+    [
+      "wr_draft_rank",
+      "high feature correlation"
+    ],
+    [
+      "rec_yards",
+      "high feature correlation"
+    ],
+    [
+      "volume_x_efficiency",
+      "high feature correlation"
+    ],
+    [
+      "rec",
+      "target correlation 0.780"
+    ],
+    [
+      "targets_80_plus",
+      "low mutual information"
+    ],
+    [
+      "yac_per_reception",
+      "low mutual information"
+    ],
+    [
+      "recent_era",
+      "low mutual information"
+    ],
+    [
+      "day_1_pick",
+      "low mutual information"
+    ],
+    [
+      "modern_era_x_yards",
+      "low mutual information"
+    ],
+    [
+      "ypr_12_plus",
+      "low mutual information"
+    ]
+  ],
+  "subset_results": {
+    "all_features": {
+      "n_features": 46,
+      "cv_mean": 0.9542544683721156,
+      "cv_std": 0.02608437309672951,
+      "temporal_score": 0.9129913710450623
+    },
+    "no_rec": {
+      "n_features": 35,
+      "cv_mean": 0.9546580270109681,
+      "cv_std": 0.028438433896614587,
+      "temporal_score": 0.8902205177372963
+    },
+    "basic_only": {
+      "n_features": 8,
+      "cv_mean": 0.7350998859822389,
+      "cv_std": 0.12027786051901677,
+      "temporal_score": 0.7346596356663471
+    },
+    "no_high_corr": {
+      "n_features": 31,
+      "cv_mean": 0.9454135954135954,
+      "cv_std": 0.03820514531946567,
+      "temporal_score": 0.8578619367209972
+    },
+    "top_mi": {
+      "n_features": 20,
+      "cv_mean": 0.9520308008543303,
+      "cv_std": 0.03263813722438208,
+      "temporal_score": 0.8914189837008629
+    },
+    "no_dominant": {
+      "n_features": 45,
+      "cv_mean": 0.9366242713301537,
+      "cv_std": 0.04795933467077129,
+      "temporal_score": 0.887823585810163
+    },
+    "rfe_selected": {
+      "n_features": 6,
+      "cv_mean": 0.9631919352507587,
+      "cv_std": 0.03554626995324634,
+      "temporal_score": null
+    }
+  }
+}

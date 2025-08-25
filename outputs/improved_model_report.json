@@ -1,0 +1,30 @@
+{
+  "model_info": {
+    "n_features": 20,
+    "features": [
+      "draft_round",
+      "age",
+      "rec_td",
+      "yards_per_reception",
+      "draft_capital_score",
+      "early_round",
+      "first_round",
+      "top_3_wr",
+      "top_5_wr",
+      "modern_era"
+    ],
+    "training_samples": 639
+  },
+  "performance": {
+    "roc_auc": 0.9471487446906935,
+    "avg_precision": 0.7527662436930396,
+    "brier_score": 0.07266178651613198
+  },
+  "improvements": {
+    "removed_high_correlation_features": true,
+    "removed_dominant_feature_rec": true,
+    "applied_stronger_regularization": true,
+    "used_temporal_validation": true,
+    "applied_calibration": true
+  }
+}

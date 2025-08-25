@@ -1,0 +1,578 @@
+"""
+comprehensive modeling module for nfl wide receiver rookie prediction
+implements multiple algorithms with proper validation, hyperparameter tuning, and class imbalance handling
+"""
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import sys
+from typing import Dict, List, Tuple, Any
+import warnings
+warnings.filterwarnings('ignore')
+
+# machine learning imports
+from sklearn.model_selection import (
+    TimeSeriesSplit, StratifiedKFold, RandomizedSearchCV, cross_val_score
+)
+from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+
+# algorithms
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.svm import SVC
+import xgboost as xgb
+
+# evaluation metrics
+from sklearn.metrics import (
+    roc_auc_score, average_precision_score, f1_score, recall_score,
+    precision_score, brier_score_loss, classification_report,
+    confusion_matrix, roc_curve, precision_recall_curve
+)
+
+# calibration curve import
+try:
+    from sklearn.calibration import calibration_curve
+except ImportError:
+    from sklearn.metrics import calibration_curve
+
+# class imbalance handling
+from imblearn.over_sampling import SMOTE, BorderlineSMOTE, ADASYN
+from imblearn.pipeline import Pipeline as ImbPipeline
+from collections import Counter
+
+import joblib
+import json
+from src.utils import save_figure, setup_plotting_style
+
+def load_features_and_target() -> Tuple[pd.DataFrame, pd.Series]:
+    """load engineered features and target variable"""
+    try:
+        X = pd.read_parquet('/home/yeblad/Desktop/New_WR_analysis/outputs/features_X.parquet')
+        y_df = pd.read_parquet('/home/yeblad/Desktop/New_WR_analysis/outputs/target_y.parquet')
+        y = y_df['target']
+        
+        print(f"loaded features: {X.shape}")
+        print(f"loaded target: {y.shape}")
+        print(f"target distribution: {y.value_counts().to_dict()}")
+        
+        return X, y
+        
+    except Exception as e:
+        print(f"error loading features and target: {e}")
+        return pd.DataFrame(), pd.Series()
+
+def create_preprocessing_pipeline(X: pd.DataFrame) -> ColumnTransformer:
+    """create preprocessing pipeline for features"""
+    print("creating preprocessing pipeline...")
+    
+    # identify numeric and categorical columns
+    numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
+    categorical_features = X.select_dtypes(include=['object']).columns.tolist()
+    
+    # numeric preprocessing
+    numeric_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='median')),
+        ('scaler', RobustScaler())
+    ])
+    
+    # categorical preprocessing
+    categorical_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='constant', fill_value='missing'))
+    ])
+    
+    # combine preprocessing steps
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numeric_transformer, numeric_features),
+            ('cat', categorical_transformer, categorical_features)
+        ]
+    )
+    
+    print(f"preprocessing pipeline created for {len(numeric_features)} numeric and {len(categorical_features)} categorical features")
+    return preprocessor
+
+def get_model_configurations() -> Dict[str, Dict]:
+    """define model configurations with hyperparameter search spaces"""
+    
+    models = {
+        'logistic_regression': {
+            'model': LogisticRegression(random_state=42, max_iter=1000),
+            'params': {
+                'model__C': [0.001, 0.01, 0.1, 1, 10, 100],
+                'model__penalty': ['l1', 'l2'],
+                'model__solver': ['liblinear', 'saga'],
+                'model__class_weight': [None, 'balanced']
+            }
+        },
+        
+        'random_forest': {
+            'model': RandomForestClassifier(random_state=42, n_jobs=-1),
+            'params': {
+                'model__n_estimators': [100, 200, 300],
+                'model__max_depth': [3, 5, 7, 10],
+                'model__min_samples_split': [2, 5, 10],
+                'model__min_samples_leaf': [1, 2, 4],
+                'model__max_features': ['sqrt', 'log2'],
+                'model__class_weight': [None, 'balanced']
+            }
+        },
+        
+        'gradient_boosting': {
+            'model': GradientBoostingClassifier(random_state=42),
+            'params': {
+                'model__n_estimators': [100, 200, 300],
+                'model__learning_rate': [0.01, 0.1, 0.2],
+                'model__max_depth': [3, 5, 7],
+                'model__min_samples_split': [2, 5, 10],
+                'model__min_samples_leaf': [1, 2, 4],
+                'model__subsample': [0.8, 0.9, 1.0]
+            }
+        },
+        
+        'xgboost': {
+            'model': xgb.XGBClassifier(random_state=42, eval_metric='logloss'),
+            'params': {
+                'model__n_estimators': [100, 200, 300],
+                'model__learning_rate': [0.01, 0.1, 0.2],
+                'model__max_depth': [3, 5, 7],
+                'model__min_child_weight': [1, 3, 5],
+                'model__gamma': [0, 0.1, 0.2],
+                'model__subsample': [0.8, 0.9, 1.0],
+                'model__colsample_bytree': [0.8, 0.9, 1.0],
+                'model__scale_pos_weight': [1, 2, 3, 5]
+            }
+        }
+    }
+    
+    return models
+
+def create_time_based_splits(X: pd.DataFrame, y: pd.Series, rookie_year_col: str = None) -> List[Tuple]:
+    """create time-based cross-validation splits"""
+    print("creating time-based cross-validation splits...")
+    
+    # fallback to stratified k-fold since we don't have reliable rookie year column
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    splits = list(skf.split(X, y))
+    print(f"created {len(splits)} stratified splits")
+    return splits
+
+def evaluate_class_imbalance_techniques(X_train: np.ndarray, y_train: np.ndarray) -> Dict[str, Any]:
+    """evaluate different class imbalance handling techniques"""
+    print("evaluating class imbalance techniques...")
+    
+    techniques = {
+        'none': None,
+        'smote': SMOTE(random_state=42),
+        'borderline_smote': BorderlineSMOTE(random_state=42)
+    }
+    
+    results = {}
+    
+    for name, technique in techniques.items():
+        try:
+            if technique is None:
+                X_resampled, y_resampled = X_train, y_train
+            else:
+                X_resampled, y_resampled = technique.fit_resample(X_train, y_train)
+            
+            # calculate class distribution
+            class_dist = Counter(y_resampled)
+            
+            results[name] = {
+                'original_distribution': Counter(y_train),
+                'resampled_distribution': class_dist,
+                'resampled_size': len(y_resampled),
+                'balance_ratio': class_dist[0] / class_dist[1] if class_dist[1] > 0 else float('inf')
+            }
+            
+            print(f"  {name}: {dict(class_dist)} (ratio: {results[name]['balance_ratio']:.2f})")
+            
+        except Exception as e:
+            print(f"  {name}: failed - {e}")
+            results[name] = {'error': str(e)}
+    
+    return results
+
+def train_and_evaluate_model(model_name: str, model_config: Dict, 
+                           X: pd.DataFrame, y: pd.Series, 
+                           cv_splits: List[Tuple], 
+                           preprocessor: ColumnTransformer,
+                           imbalance_technique: Any = None) -> Dict[str, Any]:
+    """train and evaluate a single model with cross-validation"""
+    print(f"training and evaluating {model_name}...")
+    
+    # create pipeline
+    if imbalance_technique is not None:
+        pipeline = ImbPipeline([
+            ('preprocessor', preprocessor),
+            ('sampler', imbalance_technique),
+            ('model', model_config['model'])
+        ])
+    else:
+        pipeline = Pipeline([
+            ('preprocessor', preprocessor),
+            ('model', model_config['model'])
+        ])
+    
+    # hyperparameter tuning
+    param_grid = model_config['params']
+    
+    # use stratified k-fold for hyperparameter tuning
+    skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
+    
+    search = RandomizedSearchCV(
+        pipeline, param_grid, 
+        n_iter=30,  # reduced for efficiency
+        cv=skf,
+        scoring='roc_auc',
+        n_jobs=-1,
+        random_state=42,
+        verbose=0
+    )
+    
+    # fit hyperparameter search
+    search.fit(X, y)
+    best_pipeline = search.best_estimator_
+    
+    # cross-validation evaluation
+    cv_scores = {
+        'roc_auc': [],
+        'pr_auc': [],
+        'f1': [],
+        'recall': [],
+        'precision': [],
+        'brier_score': []
+    }
+    
+    predictions = []
+    probabilities = []
+    true_labels = []
+    
+    for train_idx, test_idx in cv_splits:
+        X_train_fold = X.iloc[train_idx]
+        X_test_fold = X.iloc[test_idx]
+        y_train_fold = y.iloc[train_idx]
+        y_test_fold = y.iloc[test_idx]
+        
+        # fit on training fold
+        best_pipeline.fit(X_train_fold, y_train_fold)
+        
+        # predict on test fold
+        y_pred = best_pipeline.predict(X_test_fold)
+        y_prob = best_pipeline.predict_proba(X_test_fold)[:, 1]
+        
+        # calculate metrics
+        cv_scores['roc_auc'].append(roc_auc_score(y_test_fold, y_prob))
+        cv_scores['pr_auc'].append(average_precision_score(y_test_fold, y_prob))
+        cv_scores['f1'].append(f1_score(y_test_fold, y_pred))
+        cv_scores['recall'].append(recall_score(y_test_fold, y_pred))
+        cv_scores['precision'].append(precision_score(y_test_fold, y_pred, zero_division=0))
+        cv_scores['brier_score'].append(brier_score_loss(y_test_fold, y_prob))
+        
+        # store for overall evaluation
+        predictions.extend(y_pred)
+        probabilities.extend(y_prob)
+        true_labels.extend(y_test_fold)
+    
+    # calculate mean and std of cv scores
+    cv_results = {}
+    for metric, scores in cv_scores.items():
+        cv_results[f'{metric}_mean'] = np.mean(scores)
+        cv_results[f'{metric}_std'] = np.std(scores)
+    
+    # overall metrics
+    overall_metrics = {
+        'roc_auc': roc_auc_score(true_labels, probabilities),
+        'pr_auc': average_precision_score(true_labels, probabilities),
+        'f1': f1_score(true_labels, predictions),
+        'recall': recall_score(true_labels, predictions),
+        'precision': precision_score(true_labels, predictions, zero_division=0),
+        'brier_score': brier_score_loss(true_labels, probabilities)
+    }
+    
+    return {
+        'model_name': model_name,
+        'best_params': search.best_params_,
+        'best_pipeline': best_pipeline,
+        'cv_results': cv_results,
+        'overall_metrics': overall_metrics,
+        'predictions': predictions,
+        'probabilities': probabilities,
+        'true_labels': true_labels
+    }
+
+def create_evaluation_plots(results: Dict[str, Dict]) -> None:
+    """create comprehensive evaluation plots"""
+    print("creating evaluation plots...")
+    
+    setup_plotting_style()
+    
+    # model comparison plot
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    
+    models = list(results.keys())
+    metrics = ['roc_auc_mean', 'pr_auc_mean', 'f1_mean', 'recall_mean']
+    metric_names = ['ROC AUC', 'PR AUC', 'F1 Score', 'Recall']
+    
+    for i, (metric, name) in enumerate(zip(metrics, metric_names)):
+        ax = axes[i//2, i%2]
+        
+        values = [results[model]['cv_results'][metric] for model in models]
+        errors = [results[model]['cv_results'][metric.replace('_mean', '_std')] for model in models]
+        
+        bars = ax.bar(models, values, yerr=errors, capsize=5, alpha=0.7)
+        ax.set_title(f'{name} Comparison')
+        ax.set_ylabel(name)
+        ax.tick_params(axis='x', rotation=45)
+        
+        # add value labels on bars
+        for bar, value in zip(bars, values):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
+                   f'{value:.3f}', ha='center', va='bottom', fontsize=9)
+    
+    plt.tight_layout()
+    save_figure(fig, 'model_comparison.png')
+    
+    # roc curves
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    for model_name, result in results.items():
+        fpr, tpr, _ = roc_curve(result['true_labels'], result['probabilities'])
+        auc_score = result['overall_metrics']['roc_auc']
+        ax.plot(fpr, tpr, label=f'{model_name} (AUC = {auc_score:.3f})', linewidth=2)
+    
+    ax.plot([0, 1], [0, 1], 'k--', alpha=0.5, label='Random')
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_title('ROC Curves Comparison')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    save_figure(fig, 'roc_curves.png')
+    
+    # precision-recall curves
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    for model_name, result in results.items():
+        precision, recall, _ = precision_recall_curve(result['true_labels'], result['probabilities'])
+        pr_auc = result['overall_metrics']['pr_auc']
+        ax.plot(recall, precision, label=f'{model_name} (PR-AUC = {pr_auc:.3f})', linewidth=2)
+    
+    # baseline (random classifier)
+    baseline = np.mean(result['true_labels'])
+    ax.axhline(y=baseline, color='k', linestyle='--', alpha=0.5, label=f'Baseline ({baseline:.3f})')
+    
+    ax.set_xlabel('Recall')
+    ax.set_ylabel('Precision')
+    ax.set_title('Precision-Recall Curves Comparison')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    save_figure(fig, 'precision_recall_curves.png')
+    
+    # calibration plots for best model
+    best_model = max(results.keys(), key=lambda x: results[x]['overall_metrics']['roc_auc'])
+    best_result = results[best_model]
+    
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    try:
+        fraction_of_positives, mean_predicted_value = calibration_curve(
+            best_result['true_labels'], best_result['probabilities'], n_bins=10
+        )
+        
+        ax.plot(mean_predicted_value, fraction_of_positives, "s-", label=f'{best_model}', linewidth=2)
+        ax.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
+        ax.set_xlabel('Mean Predicted Probability')
+        ax.set_ylabel('Fraction of Positives')
+        ax.set_title(f'Calibration Plot - {best_model}')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        
+        save_figure(fig, 'calibration_plot.png')
+    except Exception as e:
+        print(f"calibration plot failed: {e}")
+
+def save_model_results(results: Dict[str, Dict]) -> None:
+    """save model results and best model"""
+    print("saving model results...")
+    
+    # save best model
+    best_model_name = max(results.keys(), key=lambda x: results[x]['overall_metrics']['roc_auc'])
+    best_model = results[best_model_name]['best_pipeline']
+    
+    model_path = '/home/yeblad/Desktop/New_WR_analysis/outputs/best_model.pkl'
+    joblib.dump(best_model, model_path)
+    print(f"best model ({best_model_name}) saved to: {model_path}")
+    
+    # save results summary
+    results_summary = {}
+    for model_name, result in results.items():
+        results_summary[model_name] = {
+            'cv_results': result['cv_results'],
+            'overall_metrics': result['overall_metrics'],
+            'best_params': result['best_params']
+        }
+    
+    results_path = '/home/yeblad/Desktop/New_WR_analysis/outputs/model_results.json'
+    with open(results_path, 'w') as f:
+        json.dump(results_summary, f, indent=2, default=str)
+    print(f"model results saved to: {results_path}")
+    
+    # save detailed metrics table
+    metrics_data = []
+    for model_name, result in results.items():
+        row = {'model': model_name}
+        row.update(result['cv_results'])
+        row.update(result['overall_metrics'])
+        metrics_data.append(row)
+    
+    metrics_df = pd.DataFrame(metrics_data)
+    metrics_path = '/home/yeblad/Desktop/New_WR_analysis/outputs/model_metrics.csv'
+    metrics_df.to_csv(metrics_path, index=False)
+    print(f"detailed metrics saved to: {metrics_path}")
+
+def create_model_summary_report(results: Dict[str, Dict]) -> None:
+    """create comprehensive model summary report"""
+    print("creating model summary report...")
+    
+    report_lines = []
+    report_lines.append("# model evaluation summary report\n\n")
+    
+    # best model identification
+    best_model_name = max(results.keys(), key=lambda x: results[x]['overall_metrics']['roc_auc'])
+    best_result = results[best_model_name]
+    
+    report_lines.append(f"## best performing model: {best_model_name}\n\n")
+    report_lines.append("### performance metrics\n")
+    
+    for metric, value in best_result['overall_metrics'].items():
+        report_lines.append(f"- **{metric.replace('_', ' ').title()}**: {value:.4f}\n")
+    
+    report_lines.append(f"\n### best hyperparameters\n")
+    for param, value in best_result['best_params'].items():
+        report_lines.append(f"- **{param}**: {value}\n")
+    
+    # model comparison table
+    report_lines.append("\n## model comparison\n\n")
+    report_lines.append("| model | roc auc | pr auc | f1 score | recall | precision |\n")
+    report_lines.append("|-------|---------|--------|----------|--------|-----------|\n")
+    
+    for model_name, result in results.items():
+        metrics = result['overall_metrics']
+        report_lines.append(
+            f"| {model_name} | {metrics['roc_auc']:.3f} | {metrics['pr_auc']:.3f} | "
+            f"{metrics['f1']:.3f} | {metrics['recall']:.3f} | {metrics['precision']:.3f} |\n"
+        )
+    
+    # cross-validation stability
+    report_lines.append("\n## cross-validation stability\n\n")
+    report_lines.append("| model | roc auc (std) | pr auc (std) | f1 (std) |\n")
+    report_lines.append("|-------|---------------|--------------|----------|\n")
+    
+    for model_name, result in results.items():
+        cv = result['cv_results']
+        report_lines.append(
+            f"| {model_name} | {cv['roc_auc_mean']:.3f} (±{cv['roc_auc_std']:.3f}) | "
+            f"{cv['pr_auc_mean']:.3f} (±{cv['pr_auc_std']:.3f}) | "
+            f"{cv['f1_mean']:.3f} (±{cv['f1_std']:.3f}) |\n"
+        )
+    
+    # key insights
+    report_lines.append("\n## key insights\n\n")
+    
+    # best and worst models
+    worst_model = min(results.keys(), key=lambda x: results[x]['overall_metrics']['roc_auc'])
+    improvement = results[best_model_name]['overall_metrics']['roc_auc'] - results[worst_model]['overall_metrics']['roc_auc']
+    
+    report_lines.append(f"- **best model**: {best_model_name} with ROC AUC of {results[best_model_name]['overall_metrics']['roc_auc']:.3f}\n")
+    report_lines.append(f"- **worst model**: {worst_model} with ROC AUC of {results[worst_model]['overall_metrics']['roc_auc']:.3f}\n")
+    report_lines.append(f"- **performance gap**: {improvement:.3f} ROC AUC points\n")
+    
+    # model stability
+    most_stable = min(results.keys(), key=lambda x: results[x]['cv_results']['roc_auc_std'])
+    report_lines.append(f"- **most stable model**: {most_stable} with ROC AUC std of {results[most_stable]['cv_results']['roc_auc_std']:.3f}\n")
+    
+    # class imbalance impact
+    baseline_precision = np.mean([result['true_labels'] for result in results.values()])
+    best_precision = results[best_model_name]['overall_metrics']['precision']
+    precision_lift = best_precision / baseline_precision if baseline_precision > 0 else 0
+    
+    report_lines.append(f"- **precision lift over baseline**: {precision_lift:.2f}x\n")
+    
+    # save report
+    report_path = '/home/yeblad/Desktop/New_WR_analysis/outputs/model_summary_report.md'
+    with open(report_path, 'w') as f:
+        f.writelines(report_lines)
+    
+    print(f"model summary report saved to: {report_path}")
+
+def main():
+    """main function to execute modeling pipeline"""
+    print("starting comprehensive modeling pipeline")
+    print("="*60)
+    
+    # load features and target
+    X, y = load_features_and_target()
+    
+    if X.empty or y.empty:
+        print("no data available for modeling")
+        return
+    
+    # create preprocessing pipeline
+    preprocessor = create_preprocessing_pipeline(X)
+    
+    # create cross-validation splits
+    cv_splits = create_time_based_splits(X, y)
+    
+    # evaluate class imbalance techniques
+    X_sample = preprocessor.fit_transform(X[:100])  # small sample for evaluation
+    y_sample = y[:100]
+    imbalance_results = evaluate_class_imbalance_techniques(X_sample, y_sample)
+    
+    # select best imbalance technique (SMOTE typically works well)
+    best_imbalance_technique = SMOTE(random_state=42)
+    
+    # get model configurations
+    model_configs = get_model_configurations()
+    
+    # train and evaluate all models
+    results = {}
+    
+    for model_name, config in model_configs.items():
+        try:
+            result = train_and_evaluate_model(
+                model_name, config, X, y, cv_splits, 
+                preprocessor, best_imbalance_technique
+            )
+            results[model_name] = result
+            
+            print(f"  {model_name} - ROC AUC: {result['overall_metrics']['roc_auc']:.3f}")
+            
+        except Exception as e:
+            print(f"  {model_name} failed: {e}")
+    
+    if not results:
+        print("no models completed successfully")
+        return
+    
+    # create evaluation plots
+    create_evaluation_plots(results)
+    
+    # save results
+    save_model_results(results)
+    
+    # create summary report
+    create_model_summary_report(results)
+    
+    print("\nmodeling pipeline completed successfully!")
+    print("results saved to /home/yeblad/Desktop/New_WR_analysis/outputs/")
+    print("visualizations saved to /home/yeblad/Desktop/New_WR_analysis/figs/")
+
+if __name__ == "__main__":
+    main()

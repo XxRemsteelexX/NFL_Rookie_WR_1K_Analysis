@@ -1,0 +1,6 @@
+metric,outlier_count,outlier_percentage,lower_bound,upper_bound
+rec,70,10.954616588419405,-196.5,335.5
+rec_yards,104,16.275430359937403,0.0,0.0
+rec_td,24,3.755868544600939,0.0,0.0
+targets,55,8.607198748043817,0.0,0.0
+yards_per_reception,104,16.275430359937403,0.0,0.0
