@@ -1,4 +1,4 @@
-# 🏈 NFL Rookie Wide Receiver 1000+ Yard Season Prediction
+# NFL Rookie Wide Receiver 1000+ Yard Season Prediction
 
 ## Advanced Machine Learning Analysis with Feature Optimization and Temporal Validation
 
@@ -6,11 +6,11 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Complete-success)
 
-## 📊 Project Overview
+## Project Overview
 
 This project develops a machine learning model to predict which NFL rookie wide receivers will achieve at least one 1000+ yard receiving season in their career. The analysis includes comprehensive feature engineering, overfitting diagnosis and remediation, and temporal validation to ensure robust predictions on future rookies.
 
-### 🎯 Key Results
+### Key Results
 
 - **Initial Model**: 97.9% ROC AUC (with severe overfitting)
 - **Improved Model**: 90.9% ROC AUC on future data (minimal overfitting)
@@ -18,15 +18,20 @@ This project develops a machine learning model to predict which NFL rookie wide 
 - **Feature Reduction**: From 46 to 20 features
 - **Business Impact**: Production-ready model for draft analysis
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 NFL_Rookie_WR_1K_Analysis/
 │
-├── data/                           # Raw data files
-│   ├── draft_data.csv             # NFL draft information
-│   ├── rookie_data.csv            # Rookie season statistics
-│   └── career_data.csv            # Career outcome data
+├── Downloads/                      # Raw data files
+│   ├── 2006-2024 rookie data     # Rookie season statistics
+│   ├── rec2006-2023.csv          # Reception data by year
+│   └── 1kseasons.csv             # Career outcome data
+│
+├── Uploads/                        # Original uploaded files
+│   ├── rookie data files
+│   ├── advanced metrics files
+│   └── model.pkl
 │
 ├── outputs/                        # Processed data and models
 │   ├── cleaned_dataset.parquet    # Integrated dataset
@@ -34,39 +39,49 @@ NFL_Rookie_WR_1K_Analysis/
 │   ├── features_X_optimized.parquet # Optimized features
 │   ├── target_y.parquet           # Target variable
 │   ├── model_metrics.csv          # Model performance metrics
-│   └── improved_model_report.json  # Final model report
+│   ├── improved_model.pkl         # Final improved model
+│   ├── improved_model_report.json # Final model report
+│   └── feature_selection_report.md # Feature analysis report
 │
 ├── figs/                           # Visualizations
 │   ├── draft_analysis.png         # Draft round analysis
 │   ├── feature_correlation_matrix.png
 │   ├── overfitting_analysis.png
-│   └── improved_model_evaluation.png
-│
-├── models/                         # Saved models
-│   ├── xgboost_model.pkl
-│   ├── rf_model.pkl
-│   ├── logistic_model.pkl
-│   └── ensemble_model.pkl
+│   ├── improved_model_evaluation.png
+│   ├── calibration_comparison.png
+│   └── feature_selection_analysis.png
 │
 ├── notebooks/
-│   └── NFL_WR_Analysis_Complete.ipynb  # Comprehensive analysis
+│   └── NFL_WR_Analysis_Complete.ipynb  # Comprehensive analysis notebook
 │
-├── scripts/
-│   ├── 01_data_integration.py     # Data loading and merging
-│   ├── 02_data_cleaning.py        # Data preprocessing
-│   ├── 03_feature_engineering.py  # Feature creation
-│   ├── 04_model_training.py       # Initial model development
-│   ├── 05_model_evaluation.py     # Model evaluation
-│   ├── 06_calibration_analysis.py # Overfitting diagnosis
-│   ├── 07_feature_analysis_selection.py # Feature optimization
-│   └── 08_improved_model.py       # Final improved model
+├── scripts/                        # Analysis scripts
+│   ├── 01_build_dataset.py       # Data loading and merging
+│   ├── 02_eda.py                 # Exploratory data analysis
+│   ├── 03_feature_eng.py         # Feature engineering
+│   ├── 04_modeling.py            # Model training
+│   ├── 05_interpret.py           # Model interpretation
+│   ├── 06_predict_recent.py      # Recent rookie predictions
+│   ├── 07_feature_analysis_selection.py  # Feature optimization
+│   ├── 08_improved_model.py      # Improved model with temporal validation
+│   ├── build_notebook.py         # Notebook generation
+│   ├── build_final_notebook.py   # Final notebook creation
+│   ├── fix_data_leakage.py       # Data leakage fixes
+│   ├── fix_model_calibration.py  # Model calibration
+│   └── utils.py                  # Utility functions
 │
-├── requirements.txt                # Python dependencies
-├── README.md                       # This file
-└── LICENSE                         # MIT License
+├── src/                           # Source code modules
+│   ├── __init__.py
+│   ├── utils.py
+│   └── visuals.py
+│
+├── Old Files/                     # Legacy HTML reports
+│
+├── requirements.txt               # Python dependencies
+├── README.md                      # This file
+└── LICENSE                        # MIT License
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -97,12 +112,12 @@ pip install -r requirements.txt
 #### Option 1: Run the Complete Pipeline
 ```bash
 # Run all scripts in sequence
-python scripts/01_data_integration.py
-python scripts/02_data_cleaning.py
-python scripts/03_feature_engineering.py
-python scripts/04_model_training.py
-python scripts/05_model_evaluation.py
-python scripts/06_calibration_analysis.py
+python scripts/01_build_dataset.py
+python scripts/02_eda.py
+python scripts/03_feature_eng.py
+python scripts/04_modeling.py
+python scripts/05_interpret.py
+python scripts/06_predict_recent.py
 python scripts/07_feature_analysis_selection.py
 python scripts/08_improved_model.py
 ```
@@ -112,7 +127,7 @@ python scripts/08_improved_model.py
 jupyter notebook notebooks/NFL_WR_Analysis_Complete.ipynb
 ```
 
-## 📈 Key Findings
+## Key Findings
 
 ### 1. The Overfitting Problem
 
@@ -147,12 +162,12 @@ The original model achieved exceptional cross-validation performance (97.9% ROC 
 | ROC AUC (CV) | 0.979 | 0.947 | -3.3% |
 | ROC AUC (Temporal) | 0.815 | 0.909 | +11.5% |
 | Overfitting Gap | 0.185 | 0.004 | -97.8% |
-| Interpretability | Low | High | ✅ |
+| Interpretability | Low | High | Improved |
 
-## 🔬 Methodology
+## Methodology
 
 ### Data Processing
-1. **Integration**: Merged draft, rookie, and career data
+1. **Integration**: Merged draft, rookie, and career data from 2006-2024
 2. **Cleaning**: Handled missing values, removed duplicates
 3. **Target Creation**: Binary classification (1000+ yard season achieved)
 
@@ -175,7 +190,7 @@ The original model achieved exceptional cross-validation performance (97.9% ROC 
 - Probability calibration
 - Feature importance analysis
 
-## 📊 Visualizations
+## Visualizations
 
 The project includes comprehensive visualizations:
 - Draft round success rate analysis
@@ -185,14 +200,14 @@ The project includes comprehensive visualizations:
 - Feature importance plots
 - Calibration plots
 
-## 🎯 Use Cases
+## Use Cases
 
 1. **NFL Teams**: Draft evaluation and rookie selection
 2. **Fantasy Football**: Player value predictions
 3. **Sports Analytics**: Career trajectory modeling
 4. **ML Education**: Case study in overfitting diagnosis
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 - [ ] Incorporate college statistics
 - [ ] Add NFL combine metrics
@@ -201,11 +216,11 @@ The project includes comprehensive visualizations:
 - [ ] Create web application for predictions
 - [ ] Implement real-time updates
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -215,11 +230,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📧 Contact
+## Contact
 
 Project Link: [https://github.com/XxRemsteelexX/NFL_Rookie_WR_1K_Analysis](https://github.com/XxRemsteelexX/NFL_Rookie_WR_1K_Analysis)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - NFL data sources
 - scikit-learn and XGBoost communities
