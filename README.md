@@ -48,7 +48,7 @@ NFL_Rookie_WR_1K_Analysis/
 │
 ├── notebooks/                      # Jupyter notebooks
 │   ├── NFL_WR_Analysis_Complete.ipynb     # Comprehensive documentation notebook
-│   └── NFL_WR_Rookie_Prediction_Analysis_Fixed_executed.ipynb  # Executed analysis with results
+│   └── NFL_WR_Rookie_Prediction_Pipeline.ipynb  # Executed analysis with results
 │
 ├── scripts/                        # Analysis scripts
 │   ├── 01_build_dataset.py       # Data loading and merging
@@ -59,6 +59,8 @@ NFL_Rookie_WR_1K_Analysis/
 │   ├── 06_predict_recent.py      # Recent rookie predictions
 │   ├── 07_feature_analysis_selection.py  # Feature optimization
 │   ├── 08_improved_model.py      # Improved model with temporal validation
+│   ├── fix_data_leakage.py      # Data leakage diagnostics
+│   ├── fix_model_calibration.py # Probability calibration analysis
 │   └── utils.py                  # Utility functions
 │
 ├── requirements.txt               # Python dependencies
@@ -114,7 +116,7 @@ We provide two comprehensive notebooks:
 
 1. **For executed results and full pipeline**:
 ```bash
-jupyter notebook notebooks/NFL_WR_Rookie_Prediction_Analysis_Fixed_executed.ipynb
+jupyter notebook notebooks/NFL_WR_Rookie_Prediction_Pipeline.ipynb
 ```
 This notebook contains the complete executed analysis with all results, visualizations, and model outputs.
 

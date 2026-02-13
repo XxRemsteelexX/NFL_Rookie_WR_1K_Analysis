@@ -36,13 +36,13 @@ def check_for_leakage():
     
     for col in df.columns:
         if 'thousand_yard' in col.lower():
-            print(f"⚠️  SUSPICIOUS: {col} - might contain target information")
+            print(f"WARNING: SUSPICIOUS: {col} - might contain target information")
             suspicious_cols.append(col)
         if '1000' in col or '1k' in col.lower():
-            print(f"⚠️  SUSPICIOUS: {col} - might contain target information")
+            print(f"WARNING: SUSPICIOUS: {col} - might contain target information")
             suspicious_cols.append(col)
         if 'future' in col.lower() or 'career' in col.lower():
-            print(f"⚠️  SUSPICIOUS: {col} - might contain future information")
+            print(f"WARNING: SUSPICIOUS: {col} - might contain future information")
             suspicious_cols.append(col)
     
     print(f"\n=== TEMPORAL ANALYSIS ===")
@@ -63,9 +63,9 @@ def check_for_leakage():
             print(f"Positive targets (has_1000_yard_season): {target_1000}")
             
             if target_1000 > rookie_1000:
-                print("✅ Target includes FUTURE seasons (correct)")
+                print("OK: Target includes FUTURE seasons (correct)")
             else:
-                print("⚠️  Target might only be rookie year (incorrect)")
+                print("WARNING: Target might only be rookie year (incorrect)")
     
     return df, suspicious_cols
 
@@ -125,7 +125,7 @@ def test_temporal_validation(X, y, df):
             print(f"Gap: {train_score - test_score:.3f}")
             
             if train_score - test_score > 0.15:
-                print("⚠️  Large gap suggests overfitting!")
+                print("WARNING: Large gap suggests overfitting!")
         else:
             print(f"Train ROC AUC: {train_score:.3f}")
             print("Not enough positive cases in test set")
@@ -146,9 +146,9 @@ def check_feature_correlations(X, y):
     print("Top 10 features by correlation with target:")
     for feat, corr in sorted_corrs[:10]:
         if corr > 0.8:
-            print(f"⚠️  {feat}: {corr:.3f} - VERY HIGH correlation")
+            print(f"WARNING: {feat}: {corr:.3f} - VERY HIGH correlation")
         elif corr > 0.6:
-            print(f"⚠  {feat}: {corr:.3f} - High correlation")
+            print(f"!! {feat}: {corr:.3f} - High correlation")
         else:
             print(f"   {feat}: {corr:.3f}")
     
@@ -229,9 +229,9 @@ def main():
         print(f"Original features CV ROC AUC: {original_scores.mean():.3f}")
         
         if scores.mean() < original_scores.mean() - 0.1:
-            print("\n⚠️  Original model is much better - possible leakage!")
+            print("\nWARNING: Original model is much better - possible leakage!")
         else:
-            print("\n✅ Performance similar - leakage unlikely")
+            print("\nOK: Performance similar - leakage unlikely")
         
         # Save clean features
         clean_X.to_parquet(OUTPUT_DIR / 'features_clean.parquet')

@@ -58,10 +58,10 @@ def analyze_feature_correlations(X, y, threshold=0.9):
     high_target_corr_features = []
     for feat, corr in sorted_target_corrs[:15]:
         if corr > 0.7:
-            print(f"⚠️  {feat:<30} {corr:.3f} - VERY HIGH (potential overfit)")
+            print(f"WARNING: {feat:<30} {corr:.3f} - VERY HIGH (potential overfit)")
             high_target_corr_features.append(feat)
         elif corr > 0.5:
-            print(f"⚠   {feat:<30} {corr:.3f} - High")
+            print(f"!! {feat:<30} {corr:.3f} - High")
         else:
             print(f"    {feat:<30} {corr:.3f}")
     
@@ -134,7 +134,7 @@ def analyze_feature_variance(X):
     # Features with near-zero variance
     near_zero_var = sorted_vars[sorted_vars < 0.01]
     if len(near_zero_var) > 0:
-        print(f"\n⚠️  Found {len(near_zero_var)} features with near-zero variance")
+        print(f"\nWARNING: Found {len(near_zero_var)} features with near-zero variance")
         return list(near_zero_var.index)
     
     return []
@@ -161,7 +161,7 @@ def mutual_information_analysis(X, y):
     # Features with very low MI
     low_mi = mi_df[mi_df['mi_score'] < 0.01]
     if len(low_mi) > 0:
-        print(f"\n⚠️  Found {len(low_mi)} features with very low MI scores")
+        print(f"\nWARNING: Found {len(low_mi)} features with very low MI scores")
     
     return mi_df
 

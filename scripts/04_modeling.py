@@ -478,9 +478,9 @@ def create_model_summary_report(results: Dict[str, Dict]) -> None:
     for model_name, result in results.items():
         cv = result['cv_results']
         report_lines.append(
-            f"| {model_name} | {cv['roc_auc_mean']:.3f} (±{cv['roc_auc_std']:.3f}) | "
-            f"{cv['pr_auc_mean']:.3f} (±{cv['pr_auc_std']:.3f}) | "
-            f"{cv['f1_mean']:.3f} (±{cv['f1_std']:.3f}) |\n"
+            f"| {model_name} | {cv['roc_auc_mean']:.3f} (+/-{cv['roc_auc_std']:.3f}) | "
+            f"{cv['pr_auc_mean']:.3f} (+/-{cv['pr_auc_std']:.3f}) | "
+            f"{cv['f1_mean']:.3f} (+/-{cv['f1_std']:.3f}) |\n"
         )
     
     # key insights

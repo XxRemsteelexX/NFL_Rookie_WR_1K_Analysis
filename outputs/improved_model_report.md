@@ -2,12 +2,12 @@
 **Date**: 2025-08-24 21:36
 
 ## Model Improvements
-- ✅ Removed 'rec' feature (correlation 0.78 with target)
-- ✅ Removed 26 highly correlated/low variance features
-- ✅ Reduced model complexity (shallower trees, fewer estimators)
-- ✅ Applied stronger regularization (L1/L2)
-- ✅ Used temporal validation instead of random splits
-- ✅ Applied probability calibration
+- - Removed 'rec' feature (correlation 0.78 with target)
+- - Removed 26 highly correlated/low variance features
+- - Reduced model complexity (shallower trees, fewer estimators)
+- - Applied stronger regularization (L1/L2)
+- - Used temporal validation instead of random splits
+- - Applied probability calibration
 
 ## Performance Metrics
 - **ROC AUC**: 0.947

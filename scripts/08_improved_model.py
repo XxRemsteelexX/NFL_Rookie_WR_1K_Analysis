@@ -363,12 +363,12 @@ def generate_model_report(model_package, evaluation_metrics, X, y, df):
     md_report.append(f"**Date**: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M')}\n\n")
     
     md_report.append("## Model Improvements\n")
-    md_report.append("- ✅ Removed 'rec' feature (correlation 0.78 with target)\n")
-    md_report.append("- ✅ Removed 26 highly correlated/low variance features\n")
-    md_report.append("- ✅ Reduced model complexity (shallower trees, fewer estimators)\n")
-    md_report.append("- ✅ Applied stronger regularization (L1/L2)\n")
-    md_report.append("- ✅ Used temporal validation instead of random splits\n")
-    md_report.append("- ✅ Applied probability calibration\n\n")
+    md_report.append("- - Removed 'rec' feature (correlation 0.78 with target)\n")
+    md_report.append("- - Removed 26 highly correlated/low variance features\n")
+    md_report.append("- - Reduced model complexity (shallower trees, fewer estimators)\n")
+    md_report.append("- - Applied stronger regularization (L1/L2)\n")
+    md_report.append("- - Used temporal validation instead of random splits\n")
+    md_report.append("- - Applied probability calibration\n\n")
     
     md_report.append("## Performance Metrics\n")
     md_report.append(f"- **ROC AUC**: {evaluation_metrics['roc_auc']:.3f}\n")
